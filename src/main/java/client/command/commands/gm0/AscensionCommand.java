@@ -50,7 +50,7 @@ public class AscensionCommand extends Command {
         int type;
         Character player = c.getPlayer();
         if (params.length < 1) {
-            player.yellowMessage("Syntax: @ascend <0=ShowMyAscensions, 1=Hoarder, 2=Resilient, 3=Lucky, 4=Blacksmith, 5=EarlyBird>");
+            player.yellowMessage("Syntax: @ascend <0=ShowMyAscensions, 1=Hoarder, 2=Resilient, 3=Lucky, 4=Blacksmith, 5=EarlyBird, 6=Crafty>");
             return;
         }
 
@@ -98,9 +98,12 @@ public class AscensionCommand extends Command {
         } else if (type == 4)
         {
             ascensionType = AscensionConstants.Names.BLACKSMITH;
-        } else
+        } else if (type == 5)
         {
             ascensionType = AscensionConstants.Names.EARLYBIRD;
+        }
+        else {
+            ascensionType = AscensionConstants.Names.CRAFTY;
         }
 
         if (!ascensions.contains(ascensionType)) {
