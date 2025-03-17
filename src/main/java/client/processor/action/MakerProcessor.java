@@ -199,48 +199,46 @@ public class MakerProcessor {
                             }
 
                             for (Pair<Integer, Integer> pair : recipe.getGainItems()) {
+                                // CRAFTY ascension provides chance to create better jewels when strengthening
+                                if (c.getPlayer().accountExtraDetails.getAscension().contains(AscensionConstants.Names.CRAFTY)) {
+                                    /*
+                                    * | Jewel Type | Basic Chance | Intermediate Chance | Advanced Chance |
+                                    * | ---------- | ------------ | ------------------- | --------------- |
+                                    * | Unenhanced | 70%          | 25%                 | 5%              |
+                                    * | Basic      | -            | 80%                 | 20%             |
+                                    */
+                                    // unrefined: 4021000  - 4021008, 4005000 - 4005004
+                                    // jewel + stat crystal: 425000x - 425090x (x 0,1,2)
+                                    // black crystal: 4251300-4251302
+                                    // dark crystal: 4251400 - 4251402
+                                    int targetItemType = (toCreate / 100);
+                                    if (targetItemType == 40210 || targetItemType == 40050
+                                        || (targetItemType >= 42500 && targetItemType <= 42509)
+                                        || (targetItemType >= 42513 && targetItemType <= 42514)) {
+                                        int targetJewelLevel = toCreate % 10;
+
+                                        int upgradeLevels = 0;
+                                        var upgradeRng = new Random().nextInt(100);
+                                        if (targetJewelLevel == 0) {
+                                            if (upgradeRng < 5) upgradeLevels += 2;
+                                            else if (upgradeRng < 30) upgradeLevels += 1;
+                                        }
+                                        else if (targetJewelLevel == 1) {
+                                            if (upgradeRng < 20) upgradeLevels += 1;
+                                        }
+
+                                        if (upgradeLevels > 0) {
+                                            pair.left += upgradeLevels;
+                                        }
+                                    }
+                                }
+
                                 c.getPlayer().setCS(true);
                                 c.getAbstractPlayerInteraction().gainItem(pair.getLeft(), pair.getRight().shortValue(), false);
                                 c.getPlayer().setCS(false);
                             }
                         } else {
                             toCreate = recipe.getGainItems().get(0).getLeft();
-
-                            // CRAFTY ascension provides chance to create better jewels when strengthening
-                            if (c.getPlayer().accountExtraDetails.getAscension().contains(AscensionConstants.Names.CRAFTY)) {
-                                log.info("has crafty");
-                                /*
-                                 * | Jewel Type | Basic Chance | Intermediate Chance | Advanced Chance |
-                                 * | ---------- | ------------ | ------------------- | --------------- |
-                                 * | Unenhanced | 75%          | 20%                 | 5%              |
-                                 * | Basic      | -            | 90%                 | 10%             |
-                                 */
-                                // unrefined: 4021000  - 4021008, 4005000 - 4005004
-                                // jewel + stat crystal: 425000x - 425090x (x 0,1,2)
-                                // black crystal: 4251300-4251302
-                                // dark crystal: 4251400 - 4251402
-                                int itemType = (toCreate / 100);
-                                log.info("item type " + itemType);
-                                if (itemType == 40210 || itemType == 40050
-                                    || (itemType >= 42500 && itemType <= 42509)
-                                    || (itemType >= 42513 && itemType <= 42514)) {
-                                    int jewelLevel = (itemType < 42500 ? 0 : (itemType % 100 + 1));
-                                    log.info("jewel level " + jewelLevel);
-                                    int upgradeLevels = 0;
-                                    var upgradeRng = new Random().nextInt(100);
-                                    log.info("rng " + upgradeRng);
-                                    if (jewelLevel == 1) {
-                                        if (upgradeRng < 5) upgradeLevels += 2;
-                                        else if (upgradeRng < 25) upgradeLevels += 1;
-                                    }
-                                    else if (jewelLevel == 2) {
-                                        if (upgradeRng < 10) upgradeLevels += 1;
-                                    }
-                                    if (upgradeLevels > 0) log.info("UPGRADE!!!!");
-                                    toCreate += upgradeLevels;
-                                    recipe.getGainItems().get(0).left = toCreate;
-                                }
-                            }
 
                             if (stimulantid != -1) {
                                 c.getAbstractPlayerInteraction().gainItem(stimulantid, (short) -1, false);
